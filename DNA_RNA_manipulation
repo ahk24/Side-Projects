@@ -1,0 +1,287 @@
+class DnaManipulation:
+    def __init__(self, DNA):
+        self.DNA = DNA
+    
+    def Transcription(self):
+        RNA_table = self.DNA.maketrans('ATCG', 'UAGC')
+        rna = self.DNA.translate(RNA_table)
+        return rna
+    
+    def direct_DNA_to_PR(self, stop_by_stop_codon:bool = False):
+        DNA_codon = ['TTT', 'TTC', 'TTA', 'TTG', 'CTT', 'CTC', 'CTA', 'CTG',
+                     'ATT', 'ATC', 'ATA', 'ATG', 'GTT', 'GTC', 'GTA', 'GTG',
+                     'TCT', 'TCC', 'TCA', 'TCG', 'CCT', 'CCC', 'CCA', 'CCG',
+                     'ACT', 'ACC', 'ACA', 'ACG', 'GCT', 'GCC', 'GCA', 'GCG',
+                     'TAT', 'TAC', 'TAA', 'TAG', 'CAT', 'CAC', 'CAA', 'CAG',
+                     'AAT', 'AAC', 'AAA', 'AAG', 'GAT', 'GAC', 'GAA', 'GAG',
+                     'TGT', 'TGC', 'TGA', 'TGG', 'CGT', 'CGC', 'CGA', 'CGG',
+                     'AGT', 'AGC', 'AGA', 'AGG', 'GGT', 'GGC', 'GGA', 'GGG']
+        AminoAcid = ['F', 'F', 'L', 'L', 'L', 'L', 'L', 'L', 'I', 'I', 'I', 'M',
+                 'V', 'V', 'V', 'V', 'S', 'S', 'S', 'S', 'P', 'P', 'P', 'P',
+                 'T', 'T', 'T', 'T', 'A', 'A', 'A', 'A', 'Y', 'Y', '^', '^', 
+                 'H', 'H', 'Q', 'Q', 'N', 'N', 'K', 'K', 'D', 'D', 'E', 'E',
+                 'C', 'C', '^', 'W', 'R', 'R', 'R', 'R', 'S', 'S', 'R', 'R',
+                 'G', 'G', 'G' ,'G']
+        dna_amino_dict = dict(zip(DNA_codon, AminoAcid))
+        pr = ''
+        pr_show = ''
+        for i in range(0, len(self.DNA), 3):
+            target = self.DNA[i:i+3]
+            if stop_by_stop_codon and ((target == 'ATT') or (target == 'ATC')
+                                       or (target == 'ACT')):
+                print('Reached a termianl codon!')
+                return pr
+            else:
+                for key, val in dna_amino_dict.items():
+                    if key == target:
+                        pr += val
+                        pr_show += val
+                        pr_show += '-'
+        print('Reached the end of sequence!')
+        print(pr_show)
+        return pr
+
+    def replace_sequnces(self, seq_to_remove: list,seq_to_replace: list = None):
+        if seq_to_replace:    
+            reference = dict(zip(seq_to_remove, seq_to_replace))
+            for item in reference.items():
+                self.DNA = self.DNA.replace(item[0], item[1])
+            return self.DNA
+        else:
+            for item in seq_to_remove:
+                self.DNA = self.DNA.replace(item, '')
+                return self.DNA
+
+class RnaManipulation:
+    def __init__(self, RNA):
+        self.RNA = RNA
+    
+    def reverse_transciption(self):
+        DNA_table = self.RNA.maketrans('UAGC', 'ATCG')
+        dna = self.RNA.translate(DNA_table)
+        return dna
+    
+    def Translation(self, stop_by_stop_codon = True):
+        AminoAcid = ['F', 'F', 'L', 'L', 'L', 'L', 'L', 'L', 'I', 'I', 'I', 'M',
+                 'V', 'V', 'V', 'V', 'S', 'S', 'S', 'S', 'P', 'P', 'P', 'P',
+                 'T', 'T', 'T', 'T', 'A', 'A', 'A', 'A', 'Y', 'Y', '^', '^', 
+                 'H', 'H', 'Q', 'Q', 'N', 'N', 'K', 'K', 'D', 'D', 'E', 'E',
+                 'C', 'C', '^', 'W', 'R', 'R', 'R', 'R', 'S', 'S', 'R', 'R',
+                 'G', 'G', 'G' ,'G']
+        RNA_codon = ['AAA','AAG','AAU','AAC','GAA','GAG','GAU','GAC','UAA','UAG','UAU','UAC',
+'CAA','CAG','CAU','CAC','AGA','AGG','AGU','AGC','GGA','GGG','GGU','GGC',
+'UGA','UGG','UGU','UGC','CGA','CGG','CGU','CGC','AUA','AUG','AUU','AUC',
+'GUA','GUG','GUU','GUC','UUA','UUG','UUU','UUC','CUA','CUG','CUU','CUC',
+'ACA','ACG','ACU','ACC','GCA','GCG','GCU','GCC','UCA','UCG','UCU','UCC',
+ 'CCA','CCG','CCU','CCC']
+        rna_to_pr = dict(zip(RNA_codon, AminoAcid))
+        pr = ''
+        pr_show = ''
+        for i in range(0, len(self.RNA), 3):
+            target = self.RNA[i:i+3]
+            if stop_by_stop_codon and ((target == 'UAG') or (target == 'UGA')
+                                       or (target == 'UAA')):
+                print('Reached a terminal codon!')
+                return pr
+            else:
+                for key, val in rna_to_pr.items():
+                    if target == key:
+                        pr += val
+                        pr_show += val
+                        pr_show += '-'
+        print('Reached the end of the sequence!')
+        print(pr_show)
+        return pr
+    
+    def replace_sequnces(self, seq_to_remove: list,seq_to_replace: list = None):
+        if seq_to_replace:    
+            reference = dict(zip(seq_to_remove, seq_to_replace))
+            for item in reference.items():
+                self.RNA = self.RNA.replace(item[0], item[1])
+            return self.RNA
+        else:
+            for item in seq_to_remove:
+                self.RNA = self.RNA.replace(item, '')
+                return self.RNA
+
+class ProteinManipulation:
+    def __init__(self, Protein):
+        self.Protein = Protein
+    
+    def Direct_pr_to_DNA(self, stop_by_stop_codon: bool = False):
+        DNA_codon = ['TTT', 'TTC', 'TTA', 'TTG', 'CTT', 'CTC', 'CTA', 'CTG',
+                     'ATT', 'ATC', 'ATA', 'ATG', 'GTT', 'GTC', 'GTA', 'GTG',
+                     'TCT', 'TCC', 'TCA', 'TCG', 'CCT', 'CCC', 'CCA', 'CCG',
+                     'ACT', 'ACC', 'ACA', 'ACG', 'GCT', 'GCC', 'GCA', 'GCG',
+                     'TAT', 'TAC', 'TAA', 'TAG', 'CAT', 'CAC', 'CAA', 'CAG',
+                     'AAT', 'AAC', 'AAA', 'AAG', 'GAT', 'GAC', 'GAA', 'GAG',
+                     'TGT', 'TGC', 'TGA', 'TGG', 'CGT', 'CGC', 'CGA', 'CGG',
+                     'AGT', 'AGC', 'AGA', 'AGG', 'GGT', 'GGC', 'GGA', 'GGG']
+        AminoAcid = ['F', 'F', 'L', 'L', 'L', 'L', 'L', 'L', 'I', 'I', 'I', 'M',
+                 'V', 'V', 'V', 'V', 'S', 'S', 'S', 'S', 'P', 'P', 'P', 'P',
+                 'T', 'T', 'T', 'T', 'A', 'A', 'A', 'A', 'Y', 'Y', '^', '^', 
+                 'H', 'H', 'Q', 'Q', 'N', 'N', 'K', 'K', 'D', 'D', 'E', 'E',
+                 'C', 'C', '^', 'W', 'R', 'R', 'R', 'R', 'S', 'S', 'R', 'R',
+                 'G', 'G', 'G' ,'G']
+        amino_dna_dict = dict(zip(AminoAcid, DNA_codon))
+        dna = ''
+        for i in range(len(self.Protein)):
+            target = self.Protein[i]
+            if stop_by_stop_codon and target == '^':
+                return dna
+            else:
+                for key, val in amino_dna_dict.items():
+                    if target == key:
+                        dna += val
+        return dna
+    
+    def reverse_translate(self, stop_by_stop_codon = False):
+        RNA_codon = ['AAA','AAG','AAU','AAC','GAA','GAG','GAU','GAC','UAA','UAG','UAU','UAC',
+'CAA','CAG','CAU','CAC','AGA','AGG','AGU','AGC','GGA','GGG','GGU','GGC',
+'UGA','UGG','UGU','UGC','CGA','CGG','CGU','CGC','AUA','AUG','AUU','AUC',
+'GUA','GUG','GUU','GUC','UUA','UUG','UUU','UUC','CUA','CUG','CUU','CUC',
+'ACA','ACG','ACU','ACC','GCA','GCG','GCU','GCC','UCA','UCG','UCU','UCC',
+ 'CCA','CCG','CCU','CCC']
+        AminoAcid = ['F', 'F', 'L', 'L', 'L', 'L', 'L', 'L', 'I', 'I', 'I', 'M',
+                 'V', 'V', 'V', 'V', 'S', 'S', 'S', 'S', 'P', 'P', 'P', 'P',
+                 'T', 'T', 'T', 'T', 'A', 'A', 'A', 'A', 'Y', 'Y', '^', '^', 
+                 'H', 'H', 'Q', 'Q', 'N', 'N', 'K', 'K', 'D', 'D', 'E', 'E',
+                 'C', 'C', '^', 'W', 'R', 'R', 'R', 'R', 'S', 'S', 'R', 'R',
+                 'G', 'G', 'G' ,'G']
+        pr_to_rna = dict(zip(AminoAcid, RNA_codon))
+        rna = ''
+        for i in range(len(self.Protein)):
+            target = self.Protein[i]
+            if stop_by_stop_codon and target == '^':
+                return rna
+            else:
+                for key, val in pr_to_rna.items():
+                    if target == key:
+                        rna += val
+        return rna  
+    
+    def replace_sequnces(self, seq_to_remove: list,seq_to_replace: list = None):
+        if seq_to_replace:    
+            reference = dict(zip(seq_to_remove, seq_to_replace))
+            for item in reference.items():
+                self.Protein = self.Protein.replace(item[0], item[1])
+            return self.Protein
+        else:
+            for item in seq_to_remove:
+                self.Protein = self.Protein.replace(item, '')
+                return self.Protein
+
+class Dna(DnaManipulation):
+        def __init__(self, DNA):
+            self.DNA = DNA
+        
+        def get_DNA(self):
+            return self.DNA
+
+        def set_DNA(self, value):
+            print('you are setting DNA to {}'.format(value))
+            self.DNA = value
+            
+        def find_num_unique_sequences(self,target_sequence: list
+                                      , number_instance_occurance:bool = True):
+            ind_dic = {}
+            for j in range(len(target_sequence)):   
+                key = target_sequence[j]
+                ind_dic.setdefault(key, [])
+                target_length = len(target_sequence[j])
+                for i in range(len(self.DNA)):
+                    if self.DNA[i: i + target_length] == target_sequence[j]:
+                        ind_dic[target_sequence[j]].append(i)
+            res_dic = {}
+            for key in ind_dic.keys():
+                key = key
+                res_dic.setdefault(key, [])
+                temp = ind_dic[key]
+                cons = temp[0]
+                res_dic[key].append(cons)
+                for i in range(len(ind_dic[key])):
+                    val = ind_dic[key]
+                    if val[i] >= cons + len(key):
+                        res_dic[key].append(val[i])
+                        cons = val[i]
+            if number_instance_occurance:
+                for key, val in res_dic.items():
+                    print('{0} has {1} instances in the sequence'.format(key, len(val)))
+            
+            return res_dic
+        
+class Rna(RnaManipulation):
+    def __init__(self, RNA):
+        self.RNA = RNA
+        
+    def get_RNA(self):
+        return self.RNA
+    
+    def set_RNA(self, value):
+        print('assigned {} to RNA'.format(value))
+        self.RNA = value
+    
+    def find_num_unique_sequences(self,target_sequence: list
+                                  , number_instance_occurance:bool = True):
+        ind_dic = {}
+        for j in range(len(target_sequence)):   
+            key = target_sequence[j]
+            ind_dic.setdefault(key, [])
+            target_length = len(target_sequence[j])
+            for i in range(len(self.RNA)):
+                if self.RNA[i: i + target_length] == target_sequence[j]:
+                    ind_dic[target_sequence[j]].append(i)
+        res_dic = {}
+        for key in ind_dic.keys():
+            key = key
+            res_dic.setdefault(key, [])
+            temp = ind_dic[key]
+            cons = temp[0]
+            res_dic[key].append(cons)
+            for i in range(len(ind_dic[key])):
+                val = ind_dic[key]
+                if val[i] >= cons + len(key):
+                    res_dic[key].append(val[i])
+                    cons = val[i]
+        if number_instance_occurance:
+            for key, val in res_dic.items():
+                print('{0} has {1} instances in the sequence'.format(key, len(val)))
+        return res_dic
+
+class Protein(ProteinManipulation):
+    def __init__(self, Pr):
+        self.Pr = Pr
+    
+    def get_Pr(self):
+        return self.Pr
+    
+    def set_Pr(self, value):
+        print('set Protein value to {}'.format(value))
+        self.Pr = value
+        
+    def find_num_unique_sequences(self,target_sequence: list
+                                  , number_instance_occurance:bool = True):
+        ind_dic = {}
+        for j in range(len(target_sequence)):   
+            key = target_sequence[j]
+            ind_dic.setdefault(key, [])
+            target_length = len(target_sequence[j])
+            for i in range(len(self.Pr)):
+                if self.Pr[i: i + target_length] == target_sequence[j]:
+                    ind_dic[target_sequence[j]].append(i)
+        res_dic = {}
+        for key in ind_dic.keys():
+            key = key
+            res_dic.setdefault(key, [])
+            temp = ind_dic[key]
+            cons = temp[0]
+            res_dic[key].append(cons)
+            for i in range(len(ind_dic[key])):
+                val = ind_dic[key]
+                if val[i] >= cons + len(key):
+                    res_dic[key].append(val[i])
+                    cons = val[i]
+        if number_instance_occurance:
+            for key, val in res_dic.items():
+                print('{0} has {1} instances in the sequence'.format(key, len(val)))
+        return res_dic
